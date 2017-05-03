@@ -22,10 +22,6 @@ class BotkitEngine {
     this.formatConfig()
 
     this.controller = Botkit.slackbot(this.getSlackbotConfig())
-
-    if (this.config.port) {
-      server.start(this.controller, this.config)
-    }
   }
 
   addHelp (helpConfigs) {
@@ -58,12 +54,14 @@ class BotkitEngine {
   formatConfig () {
     _.defaults(this.config, {debug: false})
 
+    const hasSlackAppConfigs = this.config.clientId && this.config.clientSecret && (this.config.server)
+
     this.config.connectedTeams = new Set()
 
     this.config.isSlackApp = !this.config.slackToken
 
-    if (!this.config.slackToken && !(this.config.clientId && this.config.clientSecret && this.config.port)) {
-      logger.error(`Missing configuration. Config must include either slackToken AND/OR clientId, clientSecret, and port`)
+    if (!this.config.slackToken && !hasSlackAppConfigs) {
+      logger.error(`Missing configuration. Config must include either slackToken AND/OR clientId, clientSecret, and server`)
       process.exit(1)
     }
   }
